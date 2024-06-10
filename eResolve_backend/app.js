@@ -1,15 +1,21 @@
-const express = require('express');
+const express = require("express");
+const cookieParser = require("cookie-parser");
+
 const app = express();
-const cookieParser = require('cookie-parser');
+
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser())
 
-//Import Middlewares
-const errorMiddleware = require('./middleware/error');
-//Import all routes
-const userRoutes = require('./routes/userRoutes');
-//Mounting the routes
-app.use('/api/v1', userRoutes);
+// Middleware Imports
+const errorMiddleware = require("./middleware/error")
 
-//Middleware to handle errors
-app.use(errorMiddleware);
+// Route Imports
+const userRoutes = require("./routes/userRoutes");
+
+// Mount routes
+app.use("/api/v1", userRoutes);
+
+// Middleware for error
+app.use(errorMiddleware)
+
+module.exports = app;

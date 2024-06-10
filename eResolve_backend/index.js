@@ -8,6 +8,7 @@ dotenv.config();
 
 //Connecting to database
 db();
+
 const server = http.createServer(app);
 //Uncaught exceptions
 process.on('uncaughtException', err => {
@@ -18,7 +19,7 @@ process.on('uncaughtException', err => {
 
 //Starting the server
 server.listen(process.env.PORT, () => {
-    console.log(`Server started on PORT: ${process.env.PORT} in ${process.env.NODE_ENV} mode`);
+    console.log(`Server started on PORT: http://localhost:${process.env.PORT} in ${process.env.NODE_ENV} mode`);
 });
 
 //Unhandled promise rejections

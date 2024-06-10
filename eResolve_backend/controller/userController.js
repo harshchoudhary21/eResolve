@@ -1,25 +1,40 @@
-const User = require('../models/userModel');
-const ErrorResponse = require('../utils/errorHandler');
-const catchAsyncErrors = require('../middleware/catchAsync');
-const sendEmail = require('../utils/sendEmail');
-const crypto = require('crypto');
-const sendToken = require('../utils/jwtToken');
-//const { send } = require('process');
+const User = require("../models/userModel");
+const ErrorResponse = require("../utils/errorHandler");
+const catchAsyncErrors = require("../middleware/catchAsync");
+const sendToken = require("../utils/jwtToken");
+const sendEmail = require("../utils/sendEmail");
+const crypto = require("crypto");
 const Complaint = require('../models/complaintModel');
 
 //Creating a user
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-    const { name, email, password,role,phoneNumber } = req.body;
-    const user = await User.create({
-        name,
-        email,
-        password,
-        role,
-        phoneNumber
-    });
-    console.log(user);
-    sendToken(user, 200, res);
+    console.log("hii");
+    const { name, email, phoneNumber, password, role } = req.body;
+    console.log(req.body);
+    try {
+        const user = await User.create({
+            name,
+            email,
+            phoneNumber,
+            password,
+            role,
+        });
+        console.log(user);
+        // res.status(200).json({
+        //     success: true,
+        //     message: "User registered successfully",
+        //     user
+        // });
+        sendToken(user, 200, res); // Uncomment this if you have a sendToken function
+    } catch (e) {
+        console.log("Error :- " + e);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
 });
+
 
 //Login user
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
@@ -38,7 +53,8 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     if (!isPasswordMatched) {
         return next(new ErrorResponse('Invalid Email or Password', 401));
     }
-    sendToken(user, 200, res);
+
+    sendToken(user, 200, res); // Uncomment this if you have a sendToken function
 });
 
 //logout user
