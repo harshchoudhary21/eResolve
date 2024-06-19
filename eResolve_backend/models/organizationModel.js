@@ -5,56 +5,66 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
-
+const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,}$/;
 
 const OrganizationSchema = new Schema({
     type: {
         type: String,
-        enum: ['municipality', 'ngo'],
-        required: true,
+        enum: ['Municipality', 'NGO'],
+        required: [true, 'Organization type is required'],
     },
     name: {
         type: String,
-        required: [true, 'Please add a name'],
+        required: [true, 'Organization name is required'],
     },
-    location: {
-        type: String,
-        required: true,
+    address: {
         coordinates: {
-            type: { type: String, default: "Point", enum: ["Point"] },
-            coordinates: {
-              type: [Number],
-              required: [true, "Coordinates are required"],
-            },
-          },
+            type: [Number],
+            required: true,
         },
+        addressLine: {
+            type: String,
+            required: [true, 'Please add an address or road number'],
+        },
+        city: {
+            type: String,
+            required: [true, 'Please add a city'],
+        },
+        state: {
+            type: String,
+            required: [true, 'Please add a state'],
+        },
+    },
     contactNumber: {
         type: String,
         required: [true, 'Please add a contact number'],
-        maxLength: [10, 'Contact number can not be more than 10 characters'],
-        minLength: [10, 'Contact number must be atleast 10 characters']
-        
+        maxlength: [10, 'Contact number cannot be more than 10 characters'],
+        minlength: [10, 'Contact number must be at least 10 characters'],
     },
     email: {
         type: String,
         required: [true, 'Please add an email'],
         unique: true,
-        validate: [validator.isEmail, 'Please enter a valid email']
+        validate: [validator.isEmail, 'Please enter a valid email'],
     },
     password: {
         type: String,
         required: true,
-        minLength: [6, 'Password must be atleast 6 characters'],
-        select: false //not to show the password in the response
+        minlength: [6, 'Password must be at least 6 characters'],
+        validate: {
+            validator: (value) => passwordRegex.test(value),
+            message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+        },
+        select: false, // Hide password in query results
     },
+    resetPasswordToken: String, // For storing hashed reset token
+    resetPasswordExpire: Date, // For storing token expiry date
+}, { timestamps: true });
 
+// Indexing the address.coordinates field for geospatial queries
+OrganizationSchema.index({ 'address.coordinates': '2dsphere' });
 
-});
-
-//Indexing the location field
-OrganizationSchema.index({ "location.coordinates": "2dsphere" });
-
-//Hashing the password
+// Hashing the password before saving to the database
 OrganizationSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {
         next();
@@ -66,31 +76,31 @@ OrganizationSchema.pre('save', async function(next) {
     next();
 });
 
-//JWT TOKEN GENERATION
+// Method to generate JWT token for authentication
 OrganizationSchema.methods.getSignedJwtToken = function() {
     return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE || '1h'   
+        expiresIn: process.env.JWT_EXPIRE || '1h',
     });
-}
+};
 
-//Match user entered password to hashed password in database
+// Method to compare entered password with hashed password
 OrganizationSchema.methods.matchPassword = async function(enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
-}
-//Generate and hash password token
+};
+
+// Method to generate and hash reset password token
 OrganizationSchema.methods.getResetPasswordToken = function() {
-    //Generate token
+    // Generate token
     const resetToken = crypto.randomBytes(20).toString('hex');
 
-    //Hash token and set to resetPasswordToken field
+    // Hash token and set to resetPasswordToken field
     this.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-    //Set expire
+    // Set token expiry (e.g., 10 minutes)
     this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
-    return resetToken;
-}
-
+    return resetToken; // Return unhashed token for sending to user via email
+};
 
 const Organization = mongoose.model('Organization', OrganizationSchema);
 

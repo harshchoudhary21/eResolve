@@ -1,40 +1,45 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+
 const ComplainSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: [true, 'User ID is required'],
     },
     location: {
-        type: String,
-        required: true,
+        type: {
+            type: String,
+            enum: ['Point'],
+            required: [true, 'Location type is required'],
+        },
         coordinates: {
-            type: { type: String, default: "Point", enum: ["Point"] },
-            coordinates: {
-              type: [Number],
-              required: [true, "Coordinates are required"],
-            },
-          },
-
+            type: [Number],
+            required: [true, 'Coordinates are required'],
+        },
     },
-
     description: {
         type: String,
         required: [true, 'Please add a description'],
-        maxLength: [500, 'Description can not be more than 500 characters'],
-        minLength: [10, 'Description must be atleast 10 characters']
+        maxlength: [500, 'Description cannot be more than 500 characters'],
+        minlength: [10, 'Description must be at least 10 characters'],
     },
-    imageUrl: {
+    imageUrls: [{
         type: String,
-        required: true
-    },
+        required: [true, 'At least one image URL is required'],
+    }],
     status: {
         type: String,
-        enum: ['pending', 'resolved','in-progress'],
-        default: 'pending'
+        enum: ['pending', 'resolved', 'in-progress'],
+        default: 'pending',
     },
+    organizationId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Organization',
+    }
+}, { timestamps: true });
 
-});
-ComplainSchema.index({ "location.coordinates": "2dsphere" });
+// Indexing the location field for geospatial queries
+ComplainSchema.index({ location: '2dsphere' });
+
 module.exports = mongoose.model('Complain', ComplainSchema);

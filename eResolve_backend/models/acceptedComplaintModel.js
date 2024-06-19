@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const NotificationSchema = new Schema({
-    organizationIds: [{
+    organizationIds: {
         type: Schema.Types.ObjectId,
         ref: 'Organization',
         required: true
-    }],
+    },
     complainId: {
         type: Schema.Types.ObjectId,
         ref: 'Complain',
