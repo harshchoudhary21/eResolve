@@ -1,0 +1,71 @@
+/* SignUp.css */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Ensure the body takes up at least the full viewport height */
+    margin: 0; /* Remove default margin */
+}
+
+.signup-container {
+    width: 100%; /* Example width, adjust as needed */
+    max-width: 500px; /* Maximum width, adjust as needed */
+    background-color: #ced1d7;
+    padding-left: 30px;
+    padding-right: 35px;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(255, 0, 0, 0.1);
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+  .signup-heading {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .form-input {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  
+  .checkbox-label {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .checkbox-label a {
+    color: #007bff;
+  }
+  
+  .submit-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  .role-button{
+    margin-bottom: 20px; /* Adjust the value as needed */
+  }
+  .submit-button:hover {
+    background-color: #0056b3;
+  }
+  .Submit-Button{
+    justify-content: center;
+    /* align-items: center; */
+    display: flex;
+    
+  }
+  
